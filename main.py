@@ -30,7 +30,6 @@ import sys
 from dataclasses import dataclass, field
 
 
-# Is there a better way to do forward function declarations?? - Josh
 def new_quote_id() -> int: ...
 
 
@@ -42,7 +41,7 @@ class Quote:
     author: str = "Anonymous"
 
 
-def read_json():
+def read_json() -> dict:
     with open("quotes.json", "r") as reader:
         return json.loads(reader.read())
 

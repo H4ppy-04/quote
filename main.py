@@ -61,7 +61,6 @@ def new_quote_id() -> int:
 
 def add_quote(quote: str, author: str):
     quote = Quote(len(load_quotes()), quote, author)
-    quote_json = {str(quote.identifier): {"quote": quote.quote, "author": quote.author}}
 
     file_contents = {}
 

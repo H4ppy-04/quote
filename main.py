@@ -33,7 +33,6 @@ from dataclasses import dataclass, field
 @dataclass
 class Quote:
 
-    identifier: int = field(default_factory=len(load_quotes()))
     quote: str = ""
     author: str = "Anonymous"
 
@@ -45,7 +44,11 @@ def read_json() -> dict:
 
 def load_quotes() -> list[Quote]:
     contents = read_json()
-    return [Quote(i, contents[i]["quote"], contents[i]["author"]) for i in contents]
+    quotes = [Quote(i, contents[i]["quote"], contents[i]["author"]) for i in contents]
+    if not isinstance(Quote.identifier, int):
+        Quote.identifier: int = field(default_factory=len(quotes))
+    assert isinstance(Quote.identifier, int)
+    return quotes
 
 
 def random_quote(quotes: list[Quote]) -> Quote:

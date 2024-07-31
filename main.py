@@ -67,7 +67,6 @@ def add_quote(quote: str, author: str):
 
     with open("quotes.json", "r") as reader:
         file_contents = json.loads(reader.read())
-        reader.close()
 
     file_contents[quote.identifier] = {"quote": quote.quote, "author": quote.author}
 

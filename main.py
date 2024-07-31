@@ -30,13 +30,10 @@ import sys
 from dataclasses import dataclass, field
 
 
-def new_quote_id() -> int: ...
-
-
 @dataclass
 class Quote:
 
-    identifier: int = field(default_factory=new_quote_id())
+    identifier: int = field(default_factory=len(load_quotes()))
     quote: str = ""
     author: str = "Anonymous"
 
@@ -55,18 +52,10 @@ def random_quote(quotes: list[Quote]) -> Quote:
     return random.choice(quotes)
 
 
-def new_quote_id() -> int:
-    return len(load_quotes())
-
-
 def add_quote(quote: str, author: str):
     quote = Quote(len(load_quotes()), quote, author)
 
-    file_contents = {}
-
-    with open("quotes.json", "r") as reader:
-        file_contents = json.loads(reader.read())
-
+    file_contents = read_json()
     file_contents[quote.identifier] = {"quote": quote.quote, "author": quote.author}
 
     with open("quotes.json", "w") as writer:

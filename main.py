@@ -36,7 +36,7 @@ def new_quote_id() -> int: ...
 @dataclass
 class Quote:
 
-    identifier: int = field(default_factory=new_quote_id(), init=True)
+    identifier: int = field(default_factory=new_quote_id())
     quote: str = ""
     author: str = "Anonymous"
 

@@ -36,6 +36,26 @@ class Parser:
     def __init__(self):
         self.argument_parser = argparse.ArgumentParser()
 
+        self.argument_parser.add_argument(
+            "--color",
+            choices=["always", "never", "auto"],
+            nargs="?",
+            help="Color text output",
+        )
+
+        self.argument_parser.add_argument(
+            "--verbose",
+            help="Increase verbosity",
+            action="store_true",
+        )
+
+        self.argument_parser.add_argument(
+            "-V",
+            "--version",
+            help="Display version and exit",
+            action="store_true",
+        )
+
         subparsers = self.argument_parser.add_subparsers(dest="command")
 
         self.parsers = {
@@ -189,6 +209,9 @@ def main():
 
                 len_pruned = len(quotes) - len(refined_quotes.keys())
                 print(f"Finished pruning quotes: ({len_pruned} duplicates)")
+
+        case "version":
+            pass  # TODO: print version (whatever that may be at the time of implementation)
 
 
 if __name__ == "__main__":

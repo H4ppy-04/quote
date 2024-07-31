@@ -117,7 +117,30 @@ def list_quotes(quotes: list[Quote], show_duplicates=False):
         seen_quotes.append(quote.quote)
 
 
-def prune_quotes(quotes: list[Quote]): ...
+def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote | None]:
+    seen_quotes = []
+    duplicates = []
+
+    for quote in quotes:
+        if quote.quote in seen_quotes:
+            duplicates.append(quote)
+        seen_quotes.append(quote.quote)
+    return duplicates
+
+
+def prune_quotes(quotes: dict) -> dict | None:
+    l_quotes = load_quotes()
+    max_index = len(l_quotes)
+    duplicates = get_duplicate_quotes(l_quotes)
+
+    if not len(duplicates):
+        print("No duplicates found")
+        return
+    else:
+        for index, duplicate in enumerate(duplicates):
+            if isinstance(duplicate, Quote):  # (makes pyright happy)
+                del quotes[duplicate.identifier]
+    return quotes
 
 
 def query_quote(
@@ -150,12 +173,22 @@ def main():
                 print(quote)
             else:
                 print("Couldn't find quote.")
+
         case "add":
             add_quote(args.quote, args.author, len(quotes))
+
         case "list":
             list_quotes(quotes, args.show_duplicates)
+
         case "prune":
-            prune_quotes(quotes)
+            refined_quotes = prune_quotes(read_json())
+            if isinstance(refined_quotes, dict):
+                with open("quotes.json", "w") as writer:
+                    json.dump(refined_quotes, writer)
+                    writer.close()
+
+                len_pruned = len(quotes) - len(refined_quotes.keys())
+                print(f"Finished pruning quotes: ({len_pruned} duplicates)")
 
 
 if __name__ == "__main__":

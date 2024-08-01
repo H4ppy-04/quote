@@ -25,9 +25,12 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import argparse
 import json
+import os
 import random
+import subprocess
 import sys
 from dataclasses import dataclass
+from shutil import which
 from typing import Optional
 
 
@@ -180,6 +183,27 @@ def query_quote(
         return random_quote(selected_quotes)
 
 
+def get_version() -> Optional[str]:
+    # (git must exist for this to work)
+    git_path = which("git")
+
+    if git_path is None:
+        print("Git is not installed")
+        return None
+
+    tag = subprocess.run(
+        ["git", "describe", "--abbrev=0"],
+        encoding="utf8",
+        timeout=500.0,
+        stdout=subprocess.PIPE,
+    )
+
+    if tag.returncode > 0:
+        return tag.stderr
+    else:
+        return tag.stdout
+
+
 def main():
     parser = Parser()
     args = parser._parse_args()
@@ -211,8 +235,10 @@ def main():
                 print(f"Finished pruning quotes: ({len_pruned} duplicates)")
 
         case "version":
-            pass  # TODO: print version (whatever that may be at the time of implementation)
+            version = get_version()
+            print(version)
 
 
 if __name__ == "__main__":
-    main()
+    get_version()
+    # main()

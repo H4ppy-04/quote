@@ -107,7 +107,7 @@ class Quote:
 
     identifier: int
     quote: str = ""
-    author: str = ""
+    author: str = "Anonymous"
 
     def __str__(self):
         return "Quote #{}: {} - {}".format(self.identifier, self.quote, self.author)

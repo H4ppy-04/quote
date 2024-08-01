@@ -4,4 +4,5 @@ from src import main
 
 @pytest.mark.git
 def test_version_exists():
-    assert True
+    version = main.get_version()
+    assert isinstance(version, str) and version != ""

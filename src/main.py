@@ -81,6 +81,8 @@ class Parser:
             action="store_true",
         )
 
+        self.args = self._parse_args()
+
     def _parse_args(self) -> argparse.Namespace:
         if len(sys.argv) != 1:
             return self.argument_parser.parse_args()
@@ -156,18 +158,19 @@ def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote | None]:
     return duplicates
 
 
-def prune_quotes(quotes: dict) -> dict | str:
-    l_quotes = load_quotes()
-    max_index = len(l_quotes)
-    duplicates = get_duplicate_quotes(l_quotes)
+def prune_quotes(quotes_dict: dict) -> dict | str:
+    quotes_list = load_quotes()
+    max_index = len(quotes_list)
+    duplicates = get_duplicate_quotes(quotes_list)
 
     if not len(duplicates):
         return "No duplicates found"
     else:
         for index, duplicate in enumerate(duplicates):
-            if isinstance(duplicate, Quote):  # (makes pyright happy)
-                del quotes[duplicate.identifier]
-    return quotes
+            # make sure that the Quote exists (pyright)
+            if isinstance(duplicate, Quote):
+                del quotes_dict[duplicate.identifier]
+    return quotes_dict
 
 
 def query_quote(
@@ -231,30 +234,29 @@ def get_version() -> str:
 
 def get_quote_diff(old_list: list[Quote], new_dict) -> int:
     """Find the difference in value between an old and new quote file"""
+
     diff = len(old_list) - len(new_dict.keys())
     return diff
 
 
 def main():
-    parser = Parser()
-    args = parser._parse_args()
+    parser: Parser = Parser()
+    quotes: list = load_quotes()
 
-    quotes: list[Quote] = load_quotes()
-
-    match args.command:
+    match parser.args.command:
         case "query":
-            quote = query_quote(args.id, args.author)
+            quote = query_quote(parser.args.id, parser.args.author)
             if isinstance(quote, Quote):
                 print(quote)
             else:
                 sys.exit("Couldn't find quote")
 
         case "add":
-            add_quote(args.quote, args.author, len(quotes))
+            add_quote(parser.args.quote, parser.args.author, len(quotes))
             sys.exit(f"Added quote #{len(quotes)-1}.")
 
         case "list":
-            list_quotes(quotes, args.show_duplicates)
+            list_quotes(quotes, parser.args.show_duplicates)
 
         case "prune":
             refined_quotes = prune_quotes(read_json())

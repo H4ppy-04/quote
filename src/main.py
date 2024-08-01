@@ -124,7 +124,6 @@ def add_quote(quote: str, author: str, identifier: int):
     with open("quotes.json", "w") as writer:
         json.dump(file_contents, writer)
         writer.close()
-    print(f"Added quote #{identifier}.")
 
 
 def list_quotes(quotes: list[Quote], show_duplicates=False):
@@ -150,14 +149,13 @@ def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote | None]:
     return duplicates
 
 
-def prune_quotes(quotes: dict) -> dict | None:
+def prune_quotes(quotes: dict) -> dict | str:
     l_quotes = load_quotes()
     max_index = len(l_quotes)
     duplicates = get_duplicate_quotes(l_quotes)
 
     if not len(duplicates):
-        print("No duplicates found")
-        return
+        return "No duplicates found"
     else:
         for index, duplicate in enumerate(duplicates):
             if isinstance(duplicate, Quote):  # (makes pyright happy)
@@ -224,6 +222,7 @@ def main():
 
         case "add":
             add_quote(args.quote, args.author, len(quotes))
+            sys.exit(f"Added quote #{len(quotes)-1}.")
 
         case "list":
             list_quotes(quotes, args.show_duplicates)
@@ -236,12 +235,15 @@ def main():
                     writer.close()
 
                 diff = get_quote_diff(quotes, refined_quotes)
-                print(f"Finished pruning quotes: ({diff} duplicates)")
+                sys.exit(f"Finished pruning quotes. ({diff} duplicates)")
+            elif isinstance(refined_quotes, str):
+                sys.exit(refined_quotes)
+            else:
+                raise TypeError("Unexpected type received when pruning quotes")
 
         case "version":
-            print(get_version())
+            sys.exit(get_version())
 
 
 if __name__ == "__main__":
-    get_version()
-    # main()
+    main()

@@ -25,7 +25,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import argparse
 import json
-import os
 import random
 import subprocess
 import sys
@@ -203,11 +202,17 @@ def get_version() -> str:
         return tag.stdout
 
 
+def get_quote_diff(old_list: list[Quote], new_dict) -> int:
+    """Find the difference in value between an old and new quote file"""
+    diff = len(old_list) - len(new_dict.keys())
+    return diff
+
+
 def main():
     parser = Parser()
     args = parser._parse_args()
 
-    quotes = load_quotes()
+    quotes: list[Quote] = load_quotes()
 
     match args.command:
         case "query":
@@ -215,7 +220,7 @@ def main():
             if isinstance(quote, Quote):
                 print(quote)
             else:
-                print("Couldn't find quote.")
+                sys.exit("Couldn't find quote")
 
         case "add":
             add_quote(args.quote, args.author, len(quotes))
@@ -230,8 +235,8 @@ def main():
                     json.dump(refined_quotes, writer)
                     writer.close()
 
-                len_pruned = len(quotes) - len(refined_quotes.keys())
-                print(f"Finished pruning quotes: ({len_pruned} duplicates)")
+                diff = get_quote_diff(quotes, refined_quotes)
+                print(f"Finished pruning quotes: ({diff} duplicates)")
 
         case "version":
             print(get_version())

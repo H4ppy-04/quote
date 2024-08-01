@@ -1,13 +1,7 @@
 [tool.pyright]
 include = ["src"]
-exclude = ["**/node_modules",
-    "**/__pycache__",
-    "src/experimental",
-    "src/typestubs"
-]
-# ignore = ["src/oldstuff"]
+exclude = ["**/__pycache__"]
 defineConstant = { DEBUG = true }
-# stubPath = "src/stubs"
 
 reportMissingImports = true
 reportMissingTypeStubs = false
@@ -16,15 +10,12 @@ pythonVersion = "3.12.4"
 pythonPlatform = "Linux"
 
 executionEnvironments = [
-  # { root = "src/web", pythonVersion = "3.5", pythonPlatform = "Windows", extraPaths = [ "src/service_libs" ] },
-  # { root = "src/sdk", pythonVersion = "3.0", extraPaths = [ "src/backend" ] },
-  { root = "src/", extraPaths = ["tests/" ]},
-  { root = "src" }
+  { root = ".", extraPaths = ["tests/", "src/" ]},
 ]
 
 [tool.pytest.ini_options]
+pythonpath = "src"
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "git: test send and receives from git",
 ]
-

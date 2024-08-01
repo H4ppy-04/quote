@@ -102,7 +102,7 @@ class Quote:
 
     identifier: int
     quote: str = ""
-    author: str = "Anonymous"
+    author: str = ""
 
     def __str__(self):
         return "Quote #{}: {} - {}".format(self.identifier, self.quote, self.author)
@@ -180,7 +180,7 @@ def prune_quotes(quotes_dict: dict) -> dict | str:
 
 
 def query_quote(
-    quotes: list[Quote], identifier=int | None, author=str | None
+    quotes: list[Quote], identifier: int | None, author: str | None
 ) -> Optional[Quote]:
     """Query quotes that match a given criteria.
 
@@ -247,15 +247,17 @@ def get_quote_diff(old_list: list[Quote], new_dict) -> int:
 
 def main():
     parser: Parser = Parser()
-    quotes: list = load_quotes()
+    quotes: list[Quote] = load_quotes()
 
     match parser.args.command:
         case "query":
-            quote = query_quote(parser.args.id, parser.args.author)
+            quote = query_quote(quotes, parser.args.id, parser.args.author)
             if isinstance(quote, Quote):
                 print(quote)
             else:
-                sys.exit("Couldn't find quote")
+                sys.exit(
+                    "Couldn't find quote. Make sure you provide a valid author or ID."
+                )
 
         case "add":
             add_quote(parser.args.quote, parser.args.author, len(quotes))

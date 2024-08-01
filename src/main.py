@@ -25,12 +25,15 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import argparse
 import json
+import os
 import random
 import subprocess
 import sys
 from dataclasses import dataclass
 from shutil import which
 from typing import Optional
+
+from selfupdate import update
 
 
 class Parser:
@@ -66,6 +69,9 @@ class Parser:
             "add": subparsers.add_parser("add", help="Add a new quote"),
             "list": subparsers.add_parser("list", help="List all quotes"),
             "prune": subparsers.add_parser("prune", help="Remove duplicate quotes"),
+            "update": subparsers.add_parser(
+                "update", help="Update to the newest version"
+            ),
         }
 
         self.parsers["query"].add_argument("--author", help="Quote author")
@@ -274,6 +280,9 @@ def main():
 
         case "version":
             sys.exit(get_version())
+
+        case "update":
+            update()
 
 
 if __name__ == "__main__":

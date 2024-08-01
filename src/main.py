@@ -183,13 +183,12 @@ def query_quote(
         return random_quote(selected_quotes)
 
 
-def get_version() -> Optional[str]:
+def get_version() -> str:
     # (git must exist for this to work)
     git_path = which("git")
 
     if git_path is None:
-        print("Git is not installed")
-        return None
+        return "Git is not installed"
 
     tag = subprocess.run(
         ["git", "describe", "--abbrev=0"],
@@ -235,8 +234,7 @@ def main():
                 print(f"Finished pruning quotes: ({len_pruned} duplicates)")
 
         case "version":
-            version = get_version()
-            print(version)
+            print(get_version())
 
 
 if __name__ == "__main__":

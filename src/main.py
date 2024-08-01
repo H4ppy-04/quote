@@ -34,6 +34,7 @@ from typing import Optional
 
 
 class Parser:
+    """Singular class for interfacing with the argparse parser"""
 
     def __init__(self):
         self.argument_parser = argparse.ArgumentParser()
@@ -139,6 +140,12 @@ def list_quotes(quotes: list[Quote], show_duplicates=False):
 
 
 def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote | None]:
+    """Find duplicate quotes.
+
+    The criteria for a duplicate quote is simply that if the contents of the
+    quote itself, irregardless of the author, are identical, then they are
+    deemed duplicates.
+    """
     seen_quotes = []
     duplicates = []
 
@@ -166,7 +173,13 @@ def prune_quotes(quotes: dict) -> dict | str:
 def query_quote(
     quotes: list[Quote], identifier=int | None, author=str | None
 ) -> Optional[Quote]:
-    quotes = load_quotes()
+    """Query quotes that match a given criteria.
+
+    By default, the identifier is the primary trait used to index a quote ID. If
+    the identifier is invalid, or one is not provided, return a random quote
+    from the author (if an author is specified). If none are specified, return
+    None.
+    """
 
     if identifier:
         for quote in quotes:
@@ -179,9 +192,25 @@ def query_quote(
                 selected_quotes.append(quote)
         return random_quote(selected_quotes)
 
+    # no identifier or author
+    return None
+
 
 def get_version() -> str:
-    # (git must exist for this to work)
+    """Get the current code version from the Git repository.
+
+    This function supposes three prerequisites:
+
+     1. The code has been forked or cloned.
+     2. The .git directory is present.
+     3. The Git executable is installed.
+
+    It then returns the most recent tag read directly from stdout, and in the
+    case of an error that is also returned as a string. This makes it easier
+    since no conditionals have to be used and print() can be called on this
+    function.
+    """
+
     git_path = which("git")
 
     if git_path is None:

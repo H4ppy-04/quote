@@ -157,9 +157,8 @@ def list_quotes(quotes: list[Quote], show_duplicates=False, author=None):
 def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote | None]:
     """Find duplicate quotes.
 
-    The criteria for a duplicate quote is simply that if the contents of the
-    quote itself, irregardless of the author, are identical, then they are
-    deemed duplicates.
+    The criteria for a duplicate quote is simply that the contents of the
+    quote itself, irregardless of the author, are identical.
     """
     seen_quotes = []
     duplicates = []

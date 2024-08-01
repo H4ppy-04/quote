@@ -67,25 +67,30 @@ class Parser:
         self.parsers = {
             "query": subparsers.add_parser("query", help="Query an existing quote"),
             "add": subparsers.add_parser("add", help="Add a new quote"),
-            "list": subparsers.add_parser("list", help="List all quotes"),
             "prune": subparsers.add_parser("prune", help="Remove duplicate quotes"),
             "update": subparsers.add_parser(
                 "update", help="Update to the newest version"
             ),
         }
 
-        self.parsers["query"].add_argument("--author", help="Quote author")
-        self.parsers["query"].add_argument("--id", help="Quote ID number")
+        self.parsers["query"].add_argument(
+            "--author", help="Quote author", required=False
+        )
+        self.parsers["query"].add_argument(
+            "--id", help="Quote ID number", required=False
+        )
+        self.parsers["query"].add_argument(
+            "--list", help="List all quotes", action="store_true"
+        )
+        self.parsers["query"].add_argument(
+            "--show-duplicates",
+            help="Show duplicate quotes",
+            action="store_true",
+        )
 
         self.parsers["add"].add_argument("--author", dest="author", help="Quote author")
         self.parsers["add"].add_argument("--id", help="Quote ID number")
         self.parsers["add"].add_argument("quote", help="The quote text")
-
-        self.parsers["list"].add_argument(
-            "--show-duplicates",
-            help="List duplicate quotes",
-            action="store_true",
-        )
 
         self.args = self._parse_args()
 
@@ -135,10 +140,12 @@ def add_quote(quote: str, author: str, identifier: int):
         writer.close()
 
 
-def list_quotes(quotes: list[Quote], show_duplicates=False):
+def list_quotes(quotes: list[Quote], show_duplicates=False, author=None):
     seen_quotes = []
 
     for quote in quotes:
+        if author and quote.author != author:
+            continue
         if quote.quote in seen_quotes:
             if show_duplicates:
                 print(quote)
@@ -251,20 +258,19 @@ def main():
 
     match parser.args.command:
         case "query":
-            quote = query_quote(quotes, parser.args.id, parser.args.author)
-            if isinstance(quote, Quote):
-                print(quote)
-            else:
-                sys.exit(
-                    "Couldn't find quote. Make sure you provide a valid author or ID."
+            if parser.args.list:
+                list_quotes(
+                    quotes,
+                    show_duplicates=parser.args.show_duplicates,
+                    author=parser.args.author,
                 )
+            else:
+                quote = query_quote(quotes, parser.args.id, author=parser.args.author)
+                print(quote)
 
         case "add":
             add_quote(parser.args.quote, parser.args.author, len(quotes))
             sys.exit(f"Added quote #{len(quotes)-1}.")
-
-        case "list":
-            list_quotes(quotes, parser.args.show_duplicates)
 
         case "prune":
             refined_quotes = prune_quotes(read_json())

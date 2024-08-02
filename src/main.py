@@ -33,7 +33,7 @@ from dataclasses import dataclass
 from shutil import which
 from typing import Optional
 
-from selfupdate import update
+from selfupdate import update as selfupdate
 
 
 class Parser:
@@ -91,6 +91,24 @@ class Parser:
         self.parsers["add"].add_argument("--author", dest="author", help="Quote author")
         self.parsers["add"].add_argument("--id", help="Quote ID number")
         self.parsers["add"].add_argument("quote", help="The quote text")
+
+        self.parsers["update"].add_argument(
+            "--verbose",
+            help="Print additional messages for debugging",
+            action="store_true",
+        )
+
+        self.parsers["update"].add_argument(
+            "--force",
+            help="Ignore any changes made to source code (DESTRUCTIVE)",
+            action="store_true",
+        )
+
+        self.parsers["update"].add_argument(
+            "--check-dev",
+            help="Detect and disable destructive actions in a devenv.",
+            action="store_true",
+        )
 
         self.args = self._parse_args()
 
@@ -243,6 +261,20 @@ def get_version() -> str:
         return tag.stdout
 
 
+def update(
+    force=False,
+    check_dev=True,
+    verbose=False,
+):
+    cwd = os.getcwd()
+    if verbose:
+        print("Changing CWD to root (/)")
+        print("CWD reverting after call.")
+    os.chdir("/")
+    selfupdate(force, check_dev, verbose=verbose)
+    os.chdir(cwd)
+
+
 def get_quote_diff(old_list: list[Quote], new_dict) -> int:
     """Find the difference in value between an old and new quote file"""
 
@@ -271,29 +303,26 @@ def main():
             sys.exit(f"Added quote #{len(quotes)-1}.")
 
         case "prune":
-            refined_quotes = prune_quotes(read_json())
-            if isinstance(refined_quotes, dict):
+            pruned_quotes = prune_quotes(read_json())
+            if isinstance(pruned_quotes, dict):
                 with open("quotes.json", "w") as writer:
-                    json.dump(refined_quotes, writer)
+                    json.dump(pruned_quotes, writer)
                     writer.close()
 
-                diff = get_quote_diff(quotes, refined_quotes)
+                diff = get_quote_diff(quotes, pruned_quotes)
                 sys.exit(f"Finished pruning quotes. ({diff} duplicates)")
-            elif isinstance(refined_quotes, str):
-                sys.exit(refined_quotes)
+            elif isinstance(pruned_quotes, str):
+                sys.exit(pruned_quotes)
             else:
                 raise TypeError(
-                    f"Unexpected type received when pruning quotes: {type(refined_quotes)}"
+                    f"Unexpected type received when pruning quotes: {type(pruned_quotes)}"
                 )
 
         case "version":
             sys.exit(get_version())
 
         case "update":
-            cwd = os.getcwd()
-            os.chdir("/")
-            update(verbose=True)
-            os.chdir(cwd)
+            update(parser.args.force, parser.args.check_dev, parser.args.verbose)
 
 
 if __name__ == "__main__":

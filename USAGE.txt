@@ -1,0 +1,52 @@
+                                     USAGE
+
+
+SYNOPSIS
+
+    parser [--color <always | auto | never>] [-V | --version] ...
+
+
+OPTIONS
+
+    --color <always | auto | never>
+
+      (When supported) use 8-base colors for more colorful output.
+      This is not fully integrated yet, as logging is still being worked on.
+
+    -V | --version
+
+      Print the current version. This interfaces with Git, and requires Git to be installed.
+
+
+COMMANDS
+
+    query <[--author <name>] | [--id <id>]> [--show-duplicates]
+
+      Get a specific quote by specifying its ID or get multiple quotes that are written by a specific author.
+      Duplicate quotes (quotes that have the same content - regardless of their author) can be shown as well with --show-duplicates.
+      The query command must be used with either the `author` or `id` arguments. It cannot be used on its own without positional arguments.
+
+    add [ --author <name> ] <quote>
+      
+      Add a quote to a list of quotes (in its relative json file).
+      The author field is optional, but if one isn't provided the author
+      will simply be listed as "Anonymous".
+
+    prune [--verbose]
+
+      Detect and remove duplicate quotes (as defined in the query command). Quote ID's will be reordered so that there are no gaps.
+      If the --verbose argument is specified, quote ID's and deletion events will be shown.
+
+    update [--verbose] [--force] [--check-dev]
+
+      Fetch and integrate any new changes from the remote Git repository (1).
+
+
+
+REFERENCES
+
+    (1): https://github.com/Trivoz/quote
+
+
+
+OFFICIAL DOCUMENTATION                              COPYRIGHT © 2024 Joshua Rose

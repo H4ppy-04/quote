@@ -50,12 +50,6 @@ class Parser:
         )
 
         self.argument_parser.add_argument(
-            "--verbose",
-            help="Increase verbosity",
-            action="store_true",
-        )
-
-        self.argument_parser.add_argument(
             "-V",
             "--version",
             help="Display version and exit",
@@ -89,21 +83,24 @@ class Parser:
         )
 
         self.parsers["add"].add_argument("--author", dest="author", help="Quote author")
-        self.parsers["add"].add_argument("--id", help="Quote ID number")
         self.parsers["add"].add_argument("quote", help="The quote text")
+
+        self.parsers["prune"].add_argument(
+            "--verbose",
+            help="Print deletion events and quote ID's",
+            action="store_true",
+        )
 
         self.parsers["update"].add_argument(
             "--verbose",
             help="Print additional messages for debugging",
             action="store_true",
         )
-
         self.parsers["update"].add_argument(
             "--force",
             help="Ignore any changes made to source code (DESTRUCTIVE)",
             action="store_true",
         )
-
         self.parsers["update"].add_argument(
             "--check-dev",
             help="Detect and disable destructive actions in a devenv.",
@@ -158,7 +155,7 @@ def add_quote(quote: str, author: str, identifier: int):
         writer.close()
 
 
-def list_quotes(quotes: list[Quote], show_duplicates=False, author=None):
+def list_quotes(quotes: list[Quote], show_duplicates=False, author=None) -> list[Quote]:
     seen_quotes = []
 
     for quote in quotes:
@@ -170,6 +167,7 @@ def list_quotes(quotes: list[Quote], show_duplicates=False, author=None):
         else:
             print(quote)
         seen_quotes.append(quote.quote)
+    return seen_quotes
 
 
 def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote | None]:
@@ -188,7 +186,7 @@ def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote | None]:
     return duplicates
 
 
-def prune_quotes(quotes_dict: dict) -> dict | str:
+def prune_quotes(quotes_dict: dict, verbose=False) -> dict | str:
     quotes_list = load_quotes()
     max_index = len(quotes_list)
     duplicates = get_duplicate_quotes(quotes_list)
@@ -198,7 +196,11 @@ def prune_quotes(quotes_dict: dict) -> dict | str:
     else:
         for index, duplicate in enumerate(duplicates):
             # make sure that the Quote exists (pyright)
+            if verbose:
+                print(f"Checking quote #{index}")
             if isinstance(duplicate, Quote):
+                if verbose:
+                    print(f"Removing quote #{duplicate.identifier}")
                 del quotes_dict[duplicate.identifier]
     return quotes_dict
 
@@ -303,7 +305,7 @@ def main():
             sys.exit(f"Added quote #{len(quotes)-1}.")
 
         case "prune":
-            pruned_quotes = prune_quotes(read_json())
+            pruned_quotes = prune_quotes(read_json(), parser.args.verbose)
             if isinstance(pruned_quotes, dict):
                 with open("quotes.json", "w") as writer:
                     json.dump(pruned_quotes, writer)

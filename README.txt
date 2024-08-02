@@ -1,19 +1,12 @@
-USAGE
+ABOUT
 
-To use this program, you can simply use any modern version of Python.
-One can execute this program by simply calling:
+  This is a small script that can be used to record quotes along with their authors.
+  There are quite a few commands to filter through the quotes based on a specified criteria.
+  Along with that, there are a few utility commands such as a command to update the script itself, removing duplicate quotes, etc.
 
-    python main.py
-
-which will print out a most-comprehensive help menu. Type the commands
-as they are shown to use the program effectively.
-
-Example
-
-    python main.py add "Imagination is more important than knowledge." --author "Albert Einstein"
-
+  For usage - a list of commands and further deatils - see USAGE.txt
 
 
 LICENSE
 
-This project is licensed under the MIT license.
+  This project is licensed under the MIT license.

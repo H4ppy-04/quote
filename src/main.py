@@ -289,6 +289,7 @@ def main():
             sys.exit(get_version())
 
         case "update":
+            os.chdir("/")
             update()
 
 

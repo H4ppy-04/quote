@@ -234,7 +234,6 @@ def get_version() -> str:
     tag = subprocess.run(
         ["git", "describe", "--abbrev=0"],
         encoding="utf8",
-        timeout=500.0,
         stdout=subprocess.PIPE,
     )
 
@@ -283,7 +282,9 @@ def main():
             elif isinstance(refined_quotes, str):
                 sys.exit(refined_quotes)
             else:
-                raise TypeError("Unexpected type received when pruning quotes")
+                raise TypeError(
+                    f"Unexpected type received when pruning quotes: {type(refined_quotes)}"
+                )
 
         case "version":
             sys.exit(get_version())

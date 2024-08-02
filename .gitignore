@@ -3,8 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-src/*.json
-./*.json
+/src/*.json
+*.json
 
 # C extensions
 *.so
@@ -136,6 +136,7 @@ venv.bak/
 # Spyder project settings
 .spyderproject
 .spyproject
+pyproject.toml
 
 # Rope project settings
 .ropeproject

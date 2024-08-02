@@ -33,7 +33,7 @@ from dataclasses import dataclass
 from shutil import which
 from typing import Optional
 
-from selfupdate import update as selfupdate
+import selfupdate
 
 
 class Parser:
@@ -271,7 +271,7 @@ def update(
         print("Changing CWD to root (/)")
         print("CWD reverting after call.")
     os.chdir("/")
-    selfupdate(force, check_dev, verbose=verbose)
+    selfupdate.update(force, check_dev, verbose=verbose)
     os.chdir(cwd)
 
 

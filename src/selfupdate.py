@@ -1,16 +1,35 @@
 #!/usr/bin/env python3
+"""
+MIT License
+
+Copyright (c) 2017 Broderick Carlin
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+THIS IS A MODIFIED VERSION OF THE ORIGINAL SCRIPT TO SUIT QUOTE AS A PROGRAM.
+"""
+
 
 import inspect
 import os
 
 import git
-
-__version__ = "0.2.0"
-__author__ = "Broderick Carlin (beeedy)"
-__email__ = "broderick.carlin@gmail.com"
-__license__ = "MIT"
-
-global_verbosity = False
 
 
 def __print(verbose, msg):
@@ -20,8 +39,6 @@ def __print(verbose, msg):
     are formated as such:
     <name of calling function>:<line #> :: <msg>
     """
-    if not verbose and not global_verbosity:
-        return
 
     stack = inspect.stack()
     calling_func = stack[1][3]
@@ -217,7 +234,9 @@ def pull(force=False, check_dev=True, verbose=False):
                 == "  stderr: 'error: Your local changes to the following files would be overwritten by merge:"
             ):
                 files = [a[1:] for a in err_list[4:-2]]
-                __print("Pull failed. Files with conflicts:" + "\n  ".join(files))
+                __print(
+                    verbose, "Pull failed. Files with conflicts:" + "\n  ".join(files)
+                )
                 return (False, files)
             # we got an error we didn't expect, pass it back up
             raise

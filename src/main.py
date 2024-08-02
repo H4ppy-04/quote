@@ -289,8 +289,10 @@ def main():
             sys.exit(get_version())
 
         case "update":
+            cwd = os.getcwd()
             os.chdir("/")
             update(verbose=True)
+            os.chdir(cwd)
 
 
 if __name__ == "__main__":

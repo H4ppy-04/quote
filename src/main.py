@@ -290,7 +290,7 @@ def main():
 
         case "update":
             os.chdir("/")
-            update()
+            update(verbose=True)
 
 
 if __name__ == "__main__":

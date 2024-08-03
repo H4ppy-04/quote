@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-A quoting program to be used privately on Linux
+A quoting program to be used privately on Linux.
 Copyright © 2024 Joshua Rose <joshuarose (at) gmx (dot) com>
 
 Permission is hereby granted, free of charge, to any person obtaining
@@ -37,7 +37,6 @@ import selfupdate
 
 
 class Parser:
-    """Singular class for interfacing with the argparse parser"""
 
     def __init__(self):
         self.argument_parser = argparse.ArgumentParser()
@@ -171,11 +170,6 @@ def list_quotes(quotes: list[Quote], show_duplicates=False, author=None) -> list
 
 
 def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote | None]:
-    """Find duplicate quotes.
-
-    The criteria for a duplicate quote is simply that the contents of the
-    quote itself, irregardless of the author, are identical.
-    """
     seen_quotes = []
     duplicates = []
 
@@ -208,14 +202,6 @@ def prune_quotes(quotes_dict: dict, verbose=False) -> dict | str:
 def query_quote(
     quotes: list[Quote], identifier: Optional[int], author: Optional[str]
 ) -> Optional[Quote]:
-    """Query quotes that match a given criteria.
-
-    By default, the identifier is the primary trait used to index a quote ID. If
-    the identifier is invalid, or one is not provided, return a random quote
-    from the author (if an author is specified). If none are specified, return
-    None.
-    """
-
     if identifier is not None:
         for quote in quotes:
             if int(quote.identifier) == int(identifier):
@@ -232,20 +218,7 @@ def query_quote(
 
 
 def get_version() -> str:
-    """Get the current code version from the Git repository.
-
-    This function supposes three prerequisites:
-
-     1. The code has been forked or cloned.
-     2. The .git directory is present.
-     3. The Git executable is installed.
-
-    It then returns the most recent tag read directly from stdout, and in the
-    case of an error that is also returned as a string. This makes it easier
-    since no conditionals have to be used and print() can be called on this
-    function.
-    """
-
+    """Return most recent tag read from stdout with git """
     git_path = which("git")
 
     if git_path is None:

@@ -15,8 +15,7 @@ OPTIONS
 
     -V | --version
 
-      Print the current version. This interfaces with Git, and requires Git to be installed.
-
+      Print the current version. This interfaces with Git, and requires Git to be installed and .git to be present.
 
 COMMANDS
 
@@ -25,6 +24,7 @@ COMMANDS
       Get a specific quote by specifying its ID or get multiple quotes that are written by a specific author.
       Duplicate quotes (quotes that have the same content - regardless of their author) can be shown as well with --show-duplicates.
       The query command must be used with either the `author` or `id` arguments. It cannot be used on its own without positional arguments.
+      By default, the identifier is the primary trait used to index a quote; if invalid or unspecified, the author is used instead. 
 
     add [ --author <name> ] <quote>
       
@@ -40,6 +40,7 @@ COMMANDS
     update [--verbose] [--force] [--check-dev]
 
       Fetch and integrate any new changes from the remote Git repository (1).
+      Executing the update command requires a valid git installation.
 
 
 

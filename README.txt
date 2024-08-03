@@ -4,7 +4,10 @@ ABOUT
   There are quite a few commands to filter through the quotes based on a specified criteria.
   Along with that, there are a few utility commands such as a command to update the script itself, removing duplicate quotes, etc.
 
-  For usage - a list of commands and further deatils - see USAGE.txt
+
+USAGE
+
+    See USAGE.txt
 
 
 LICENSE

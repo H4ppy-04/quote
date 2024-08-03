@@ -218,7 +218,7 @@ def query_quote(
 
 
 def get_version() -> str:
-    """Return most recent tag read from stdout with git """
+    """Return most recent tag read from stdout with git"""
     git_path = which("git")
 
     if git_path is None:

@@ -128,13 +128,13 @@ class Quote:
         return "Quote #{}: {} - {}".format(self.identifier, self.quote, self.author)
 
 
-def read_json() -> dict:
-    with open("quotes.json", "r") as reader:
+def read_json(file="quotes.json") -> dict:
+    with open(file, "r") as reader:
         return json.loads(reader.read())
 
 
-def load_quotes() -> list[Quote]:
-    contents = read_json()
+def load_quotes(file="quotes.json") -> list[Quote]:
+    contents = read_json(file)
     quotes = [Quote(i, contents[i]["quote"], contents[i]["author"]) for i in contents]
     return quotes
 
@@ -144,10 +144,10 @@ def random_quote(quotes: list[Quote]) -> Quote | None:
         return random.choice(quotes)
 
 
-def add_quote(quote: str, author: str, identifier: int):
+def add_quote(quote: str, author: str, identifier: int, file="quotes.json"):
     _quote = Quote(identifier, quote, author)
 
-    file_contents = read_json()
+    file_contents = read_json(file)
     file_contents[_quote.identifier] = {"quote": _quote.quote, "author": _quote.author}
 
     with open("quotes.json", "w") as writer:
@@ -206,7 +206,7 @@ def prune_quotes(quotes_dict: dict, verbose=False) -> dict | str:
 
 
 def query_quote(
-    quotes: list[Quote], identifier: int | None, author: str | None
+    quotes: list[Quote], identifier: Optional[int], author: Optional[str]
 ) -> Optional[Quote]:
     """Query quotes that match a given criteria.
 
@@ -216,11 +216,11 @@ def query_quote(
     None.
     """
 
-    if identifier:
+    if identifier is not None:
         for quote in quotes:
-            if quote.identifier == identifier:
+            if int(quote.identifier) == int(identifier):
                 return quote
-    if author:
+    if author is not None:
         selected_quotes = []
         for quote in quotes:
             if quote.author == author:
@@ -277,7 +277,7 @@ def update(
     os.chdir(cwd)
 
 
-def get_quote_diff(old_list: list[Quote], new_dict) -> int:
+def get_quote_diff(old_list: list[Quote], new_dict: dict) -> int:
     """Find the difference in value between an old and new quote file"""
 
     diff = len(old_list) - len(new_dict.keys())

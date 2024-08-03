@@ -1,7 +1,6 @@
 ABOUT
 
-  This is a small script that can be used to record quotes along with their authors.
-  There are quite a few commands to filter through the quotes based on a specified criteria.
+  This is a quote management tool able to manage, maintain, delete, and filter between quotes and their respective authors.
   Along with that, there are a few utility commands such as a command to update the script itself, removing duplicate quotes, etc.
 
 

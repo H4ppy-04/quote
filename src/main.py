@@ -31,7 +31,6 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from shutil import which
-from typing import Optional
 
 import selfupdate
 
@@ -200,8 +199,8 @@ def prune_quotes(quotes_dict: dict, verbose=False) -> dict | str:
 
 
 def query_quote(
-    quotes: list[Quote], identifier: Optional[int], author: Optional[str]
-) -> Optional[Quote]:
+    quotes: list[Quote], identifier: int | None, author: str | None
+) -> Quote | None:
     if identifier is not None:
         for quote in quotes:
             if int(quote.identifier) == int(identifier):

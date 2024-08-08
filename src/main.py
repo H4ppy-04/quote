@@ -179,9 +179,8 @@ def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote | None]:
     return duplicates
 
 
-def prune_quotes(quotes_dict: dict, verbose=False) -> dict | str:
+def prune_quotes(quotes_dict: dict[str, Quote], verbose=False) -> dict | str:
     quotes_list = load_quotes()
-    max_index = len(quotes_list)
     duplicates = get_duplicate_quotes(quotes_list)
 
     if not len(duplicates):
@@ -206,7 +205,7 @@ def query_quote(
             if int(quote.identifier) == int(identifier):
                 return quote
     if author is not None:
-        selected_quotes = []
+        selected_quotes: list[Quote] = []
         for quote in quotes:
             if quote.author == author:
                 selected_quotes.append(quote)

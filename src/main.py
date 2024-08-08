@@ -31,6 +31,7 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from shutil import which
+from typing import Any, override
 
 import selfupdate
 
@@ -40,14 +41,14 @@ class Parser:
     def __init__(self):
         self.argument_parser = argparse.ArgumentParser()
 
-        self.argument_parser.add_argument(
+        _ = self.argument_parser.add_argument(
             "--color",
             choices=["always", "never", "auto"],
             nargs="?",
             help="Color text output",
         )
 
-        self.argument_parser.add_argument(
+        _ = self.argument_parser.add_argument(
             "-V",
             "--version",
             help="Display version and exit",
@@ -65,41 +66,43 @@ class Parser:
             ),
         }
 
-        self.parsers["query"].add_argument(
+        _ = self.parsers["query"].add_argument(
             "--author", help="Quote author", required=False
         )
-        self.parsers["query"].add_argument(
+        _ = self.parsers["query"].add_argument(
             "--id", help="Quote ID number", required=False
         )
-        self.parsers["query"].add_argument(
+        _ = self.parsers["query"].add_argument(
             "--list", help="List all quotes", action="store_true"
         )
-        self.parsers["query"].add_argument(
+        _ = self.parsers["query"].add_argument(
             "--show-duplicates",
             help="Show duplicate quotes",
             action="store_true",
         )
 
-        self.parsers["add"].add_argument("--author", dest="author", help="Quote author")
-        self.parsers["add"].add_argument("quote", help="The quote text")
+        _ = self.parsers["add"].add_argument(
+            "--author", dest="author", help="Quote author"
+        )
+        _ = self.parsers["add"].add_argument("quote", help="The quote text")
 
-        self.parsers["prune"].add_argument(
+        _ = self.parsers["prune"].add_argument(
             "--verbose",
             help="Print deletion events and quote ID's",
             action="store_true",
         )
 
-        self.parsers["update"].add_argument(
+        _ = self.parsers["update"].add_argument(
             "--verbose",
             help="Print additional messages for debugging",
             action="store_true",
         )
-        self.parsers["update"].add_argument(
+        _ = self.parsers["update"].add_argument(
             "--force",
             help="Ignore any changes made to source code (DESTRUCTIVE)",
             action="store_true",
         )
-        self.parsers["update"].add_argument(
+        _ = self.parsers["update"].add_argument(
             "--check-dev",
             help="Detect and disable destructive actions in a devenv.",
             action="store_true",
@@ -122,18 +125,21 @@ class Quote:
     quote: str = ""
     author: str = "Anonymous"
 
+    @override
     def __str__(self):
         return "Quote #{}: {} - {}".format(self.identifier, self.quote, self.author)
 
 
-def read_json(file="quotes.json") -> dict:
+def read_json(file: str = "quotes.json"):
     with open(file, "r") as reader:
         return json.loads(reader.read())
 
 
-def load_quotes(file="quotes.json") -> list[Quote]:
+def load_quotes(file: str = "quotes.json") -> list[Quote]:
     contents = read_json(file)
-    quotes = [Quote(i, contents[i]["quote"], contents[i]["author"]) for i in contents]
+    quotes: list[Quote] = [
+        Quote(i, contents[i]["quote"], contents[i]["author"]) for i in contents
+    ]
     return quotes
 
 
@@ -153,8 +159,10 @@ def add_quote(quote: str, author: str, identifier: int, file="quotes.json"):
         writer.close()
 
 
-def list_quotes(quotes: list[Quote], show_duplicates=False, author=None) -> list[Quote]:
-    seen_quotes = []
+def list_quotes(
+    quotes: list[Quote], show_duplicates: bool = False, author: str | None = None
+) -> list[Quote]:
+    seen_quotes: list[Quote] = []
 
     for quote in quotes:
         if author and quote.author != author:

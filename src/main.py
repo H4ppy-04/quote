@@ -33,7 +33,7 @@ from dataclasses import dataclass
 from shutil import which
 from typing import override, reveal_type
 
-import selfupdate
+import update
 
 
 def _print(msg, verbose: bool = False):
@@ -257,7 +257,7 @@ def get_version() -> str:
         return tag.stdout
 
 
-def update(
+def update_changes(
     force: bool = False,
     check_dev: bool = True,
     verbose: bool = False,
@@ -266,7 +266,7 @@ def update(
     _print("Changing CWD to root (/)", verbose)
     _print("CWD reverting after call.", verbose)
     os.chdir("/")
-    selfupdate.update(force, check_dev, verbose=verbose)
+    update.pull_changes(force, check_dev, verbose=verbose)
     os.chdir(cwd)
 
 
@@ -318,7 +318,9 @@ def main():
             sys.exit(get_version())
 
         case "update":
-            update(parser.args.force, parser.args.check_dev, parser.args.verbose)
+            update_changes(
+                parser.args.force, parser.args.check_dev, parser.args.verbose
+            )
 
 
 if __name__ == "__main__":

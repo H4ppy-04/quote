@@ -342,7 +342,7 @@ def push(
             raise
 
 
-def update(
+def pull_changes(
     force=False,
     check_dev=True,
     message="Pushing up changes with python selfupdate",

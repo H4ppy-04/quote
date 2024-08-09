@@ -46,14 +46,14 @@ class Parser:
     def __init__(self):
         self.argument_parser = argparse.ArgumentParser()
 
-        _ = self.argument_parser.add_argument(
+        self.argument_parser.add_argument(
             "-V",
             "--version",
             help="Display version and exit",
             action="store_true",
         )
 
-        _ = self.argument_parser.add_argument(
+        self.argument_parser.add_argument(
             "--file",
             help="Use a custom quotes file instead of the default quotes.json file",
             required=False,
@@ -71,43 +71,41 @@ class Parser:
             ),
         }
 
-        _ = self.parsers["query"].add_argument(
+        self.parsers["query"].add_argument(
             "--author", help="Quote author", required=False
         )
-        _ = self.parsers["query"].add_argument(
+        self.parsers["query"].add_argument(
             "--id", help="Quote ID number", required=False
         )
-        _ = self.parsers["query"].add_argument(
+        self.parsers["query"].add_argument(
             "--list", help="List all quotes", action="store_true"
         )
-        _ = self.parsers["query"].add_argument(
+        self.parsers["query"].add_argument(
             "--show-duplicates",
             help="Show duplicate quotes",
             action="store_true",
         )
 
-        _ = self.parsers["add"].add_argument(
-            "--author", dest="author", help="Quote author"
-        )
-        _ = self.parsers["add"].add_argument("quote", help="The quote text")
+        self.parsers["add"].add_argument("--author", dest="author", help="Quote author")
+        self.parsers["add"].add_argument("quote", help="The quote text")
 
-        _ = self.parsers["prune"].add_argument(
+        self.parsers["prune"].add_argument(
             "--verbose",
             help="Print deletion events and quote ID's",
             action="store_true",
         )
 
-        _ = self.parsers["update"].add_argument(
+        self.parsers["update"].add_argument(
             "--verbose",
             help="Print additional messages for debugging",
             action="store_true",
         )
-        _ = self.parsers["update"].add_argument(
+        self.parsers["update"].add_argument(
             "--force",
             help="Ignore any changes made to source code (DESTRUCTIVE)",
             action="store_true",
         )
-        _ = self.parsers["update"].add_argument(
+        self.parsers["update"].add_argument(
             "--check-dev",
             help="Detect and disable destructive actions in a devenv.",
             action="store_true",
@@ -285,7 +283,7 @@ def main():
     match parser.args.command:
         case "query":
             if parser.args.list:
-                _ = list_quotes(
+                list_quotes(
                     quotes,
                     show_duplicates=parser.args.show_duplicates,
                     author=parser.args.author,

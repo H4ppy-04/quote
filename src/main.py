@@ -243,9 +243,9 @@ def get_version() -> str:
 
 
 def update(
-    force=False,
-    check_dev=True,
-    verbose=False,
+    force: bool = False,
+    check_dev: bool = True,
+    verbose: bool = False,
 ):
     cwd = os.getcwd()
     if verbose:
@@ -256,7 +256,7 @@ def update(
     os.chdir(cwd)
 
 
-def get_quote_diff(old_list: list[Quote], new_dict: dict) -> int:
+def get_quote_diff(old_list: list[Quote], new_dict: dict[str, Quote]) -> int:
     """Find the difference in value between an old and new quote file"""
 
     diff = len(old_list) - len(new_dict.keys())

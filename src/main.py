@@ -213,9 +213,9 @@ def prune_quotes(quotes_dict: dict[int, str], verbose: bool = False) -> dict | s
     else:
         for index, duplicate in enumerate(duplicates):
             # make sure that the Quote exists (pyright)
-            print(f"Checking quote #{index}", verbose)
+            _print(f"Checking quote #{index}", verbose)
             if isinstance(duplicate, Quote):
-                print(f"Removing quote #{duplicate.identifier}", verbose)
+                _print(f"Removing quote #{duplicate.identifier}", verbose)
                 del quotes_dict[duplicate.identifier]
     return quotes_dict
 
@@ -263,8 +263,8 @@ def update(
     verbose: bool = False,
 ):
     cwd = os.getcwd()
-    print("Changing CWD to root (/)", verbose)
-    print("CWD reverting after call.", verbose)
+    _print("Changing CWD to root (/)", verbose)
+    _print("CWD reverting after call.", verbose)
     os.chdir("/")
     selfupdate.update(force, check_dev, verbose=verbose)
     os.chdir(cwd)

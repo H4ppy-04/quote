@@ -90,7 +90,7 @@ def __find_repo(verbose=False):
                 "Found root of repo located at: {}".format(os.path.normpath(file_path)),
             )
             return os.path.normpath(file_path)
-        except git.exc.InvalidGitRepositoryError:
+        except git.InvalidGitRepositoryError:
             file_path = os.path.normpath(file_path + "/..")
 
 
@@ -101,7 +101,7 @@ def __find_current_branch(repo, verbose=False):
     an IOError is raised to indicate something has gone wrong.
     """
     assert (
-        type(repo) is git.repo.base.Repo
+        type(repo) is git.Repo
     ), "Passed in repo needs to be of type 'git.repo.base.Repo'"
     branches = str(repo.git.branch()).splitlines()
     for branch in branches:
@@ -160,7 +160,7 @@ def __get_file_conflicts(repo, verbose=False):
     the remote repo.
     """
     assert (
-        type(repo) is git.repo.base.Repo
+        type(repo) is git.Repo
     ), "Passed in repo needs to be of type 'git.repo.base.Repo'"
     diff = str(repo.git.diff("--name-only", "--diff-filter=U")).splitlines()
     if len(diff) == 0:
@@ -180,7 +180,7 @@ def __get_file_diffs(repo, verbose=False):
     between the remote and local repo.
     """
     assert (
-        type(repo) is git.repo.base.Repo
+        type(repo) is git.Repo
     ), "Passed in repo needs to be of type 'git.repo.base.Repo'"
     diff = str(repo.git.diff("--name-only")).splitlines()
     if len(diff) == 0:
@@ -225,7 +225,7 @@ def pull(force=False, check_dev=True, verbose=False):
             __print(verbose, "Files that were updated:" + "\n  ".join(files))
             return (True, files)
 
-        except git.exc.GitCommandError as err:
+        except git.GitCommandError as err:
             err_list = str(err).splitlines()
 
             # this is a poor and rudamentary way to tell if there was a specific error TODO: fix
@@ -312,7 +312,7 @@ def push(
         __print(
             verbose, "Commit all local changes with response: {}".format(commit_resp)
         )
-    except git.exc.GitCommandError:
+    except git.GitCommandError:
         # TODO: handle errors that may occur when doing a commit
         pass
 
@@ -333,7 +333,7 @@ def push(
             else:
                 push_resp = str(repo.git.push("origin", branch))
         __print(verbose, "Push all local changes with response: {}".format(push_resp))
-    except git.exc.GitCommandError as err:
+    except git.GitCommandError as err:
         err = str(err).splitlines()
         # handle incorrect username/password
         if "remote: Invalid username or password." in err[-2]:

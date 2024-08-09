@@ -31,7 +31,7 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from shutil import which
-from typing import Any, override
+from typing import override
 
 import selfupdate
 

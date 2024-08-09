@@ -47,17 +47,17 @@ class Parser:
         self.argument_parser = argparse.ArgumentParser()
 
         _ = self.argument_parser.add_argument(
-            "--color",
-            choices=["always", "never", "auto"],
-            nargs="?",
-            help="Color text output",
-        )
-
-        _ = self.argument_parser.add_argument(
             "-V",
             "--version",
             help="Display version and exit",
             action="store_true",
+        )
+
+        _ = self.argument_parser.add_argument(
+            "--file",
+            help="Use a custom quotes file instead of the default quotes.json file",
+            required=False,
+            type=str,
         )
 
         subparsers = self.argument_parser.add_subparsers(dest="command")
@@ -280,6 +280,7 @@ def get_quote_diff(old_list: list[Quote], new_dict: dict[str, Quote]) -> int:
 def main():
     parser: Parser = Parser()
     quotes: list[Quote] = load_quotes()
+    quote_file = parser.args.file if parser.args.file is not None else "quotes.json"
 
     match parser.args.command:
         case "query":
@@ -294,15 +295,17 @@ def main():
                 print(quote)
 
         case "add":
-            add_quote(parser.args.quote, parser.args.author, len(quotes))
+            add_quote(
+                parser.args.quote, parser.args.author, len(quotes), file=quote_file
+            )
             sys.exit(f"Added quote #{len(quotes)-1}.")
 
         case "prune":
             pruned_quotes: str | dict[str, Quote] = prune_quotes(
-                read_json(), parser.args.verbose
+                read_json(file=quote_file), parser.args.verbose
             )
             if isinstance(pruned_quotes, dict):
-                with open("quotes.json", "w") as writer:
+                with open(quote_file, "w") as writer:
                     json.dump(pruned_quotes, writer)
                     writer.close()
 

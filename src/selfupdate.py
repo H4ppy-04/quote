@@ -226,20 +226,9 @@ def pull(force=False, check_dev=True, verbose=False):
             return (True, files)
 
         except git.GitCommandError as err:
-            err_list = str(err).splitlines()
-
-            # this is a poor and rudamentary way to tell if there was a specific error TODO: fix
-            if (
-                err_list[3]
-                == "  stderr: 'error: Your local changes to the following files would be overwritten by merge:"
-            ):
-                files = [a[1:] for a in err_list[4:-2]]
-                __print(
-                    verbose, "Pull failed. Files with conflicts:" + "\n  ".join(files)
-                )
-                return (False, files)
-            # we got an error we didn't expect, pass it back up
-            raise
+            raise Exception("{}: {}".format(err.status, err._msg))
+        else:
+            raise  # pass unexpected error
 
         return (True, [])
     else:
@@ -312,9 +301,9 @@ def push(
         __print(
             verbose, "Commit all local changes with response: {}".format(commit_resp)
         )
-    except git.GitCommandError:
+    except git.GitCommandError as exc:
         # TODO: handle errors that may occur when doing a commit
-        pass
+        raise git.GitCommandError("Couldn't perform commit: %s" % exc)
 
     # perform "git push" with credentials if provided
     try:

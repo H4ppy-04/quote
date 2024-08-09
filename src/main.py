@@ -31,7 +31,7 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from shutil import which
-from typing import override
+from typing import override, reveal_type
 
 import selfupdate
 
@@ -132,11 +132,12 @@ class Quote:
 
 def read_json(file: str = "quotes.json"):
     with open(file, "r") as reader:
-        return json.loads(reader.read())
+        contents: dict[int, str] = json.loads(reader.read())
+        return contents
 
 
 def load_quotes(file: str = "quotes.json") -> list[Quote]:
-    contents = read_json(file)
+    contents: dict = read_json(file)
     quotes: list[Quote] = [
         Quote(i, contents[i]["quote"], contents[i]["author"]) for i in contents
     ]
@@ -151,7 +152,7 @@ def random_quote(quotes: list[Quote]) -> Quote | None:
 def add_quote(quote: str, author: str, identifier: int, file="quotes.json"):
     _quote = Quote(identifier, quote, author)
 
-    file_contents = read_json(file)
+    file_contents: dict = read_json(file)
     file_contents[_quote.identifier] = {"quote": _quote.quote, "author": _quote.author}
 
     with open("quotes.json", "w") as writer:
@@ -161,8 +162,8 @@ def add_quote(quote: str, author: str, identifier: int, file="quotes.json"):
 
 def list_quotes(
     quotes: list[Quote], show_duplicates: bool = False, author: str | None = None
-) -> list[Quote]:
-    seen_quotes: list[Quote] = []
+) -> list[str]:
+    seen_quotes: list[str] = []
 
     for quote in quotes:
         if author and quote.author != author:
@@ -176,9 +177,9 @@ def list_quotes(
     return seen_quotes
 
 
-def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote | None]:
-    seen_quotes = []
-    duplicates = []
+def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote] | None:
+    seen_quotes: list[str] = []
+    duplicates: list[Quote] = []
 
     for quote in quotes:
         if quote.quote in seen_quotes:
@@ -187,11 +188,11 @@ def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote | None]:
     return duplicates
 
 
-def prune_quotes(quotes_dict: dict[str, Quote], verbose=False) -> dict | str:
-    quotes_list = load_quotes()
-    duplicates = get_duplicate_quotes(quotes_list)
+def prune_quotes(quotes_dict: dict[int, str], verbose: bool = False) -> dict | str:
+    quotes_list: list[Quote] = load_quotes()
+    duplicates: list[Quote] | None = get_duplicate_quotes(quotes_list)
 
-    if not len(duplicates):
+    if (isinstance(duplicates, list) and len(duplicates) == 0) or duplicates is None:
         return "No duplicates found"
     else:
         for index, duplicate in enumerate(duplicates):
@@ -270,7 +271,7 @@ def main():
     match parser.args.command:
         case "query":
             if parser.args.list:
-                list_quotes(
+                _ = list_quotes(
                     quotes,
                     show_duplicates=parser.args.show_duplicates,
                     author=parser.args.author,
@@ -284,7 +285,9 @@ def main():
             sys.exit(f"Added quote #{len(quotes)-1}.")
 
         case "prune":
-            pruned_quotes = prune_quotes(read_json(), parser.args.verbose)
+            pruned_quotes: str | dict[str, Quote] = prune_quotes(
+                read_json(), parser.args.verbose
+            )
             if isinstance(pruned_quotes, dict):
                 with open("quotes.json", "w") as writer:
                     json.dump(pruned_quotes, writer)
@@ -292,12 +295,8 @@ def main():
 
                 diff = get_quote_diff(quotes, pruned_quotes)
                 sys.exit(f"Finished pruning quotes. ({diff} duplicates)")
-            elif isinstance(pruned_quotes, str):
-                sys.exit(pruned_quotes)
             else:
-                raise TypeError(
-                    f"Unexpected type received when pruning quotes: {type(pruned_quotes)}"
-                )
+                sys.exit(pruned_quotes)
 
         case "version":
             sys.exit(get_version())

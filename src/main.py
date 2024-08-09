@@ -36,6 +36,11 @@ from typing import override, reveal_type
 import selfupdate
 
 
+def _print(msg, verbose: bool = False):
+    if verbose:
+        print(msg)
+
+
 class Parser:
 
     def __init__(self):
@@ -197,11 +202,9 @@ def prune_quotes(quotes_dict: dict[int, str], verbose: bool = False) -> dict | s
     else:
         for index, duplicate in enumerate(duplicates):
             # make sure that the Quote exists (pyright)
-            if verbose:
-                print(f"Checking quote #{index}")
+            print(f"Checking quote #{index}", verbose)
             if isinstance(duplicate, Quote):
-                if verbose:
-                    print(f"Removing quote #{duplicate.identifier}")
+                print(f"Removing quote #{duplicate.identifier}", verbose)
                 del quotes_dict[duplicate.identifier]
     return quotes_dict
 
@@ -249,9 +252,8 @@ def update(
     verbose: bool = False,
 ):
     cwd = os.getcwd()
-    if verbose:
-        print("Changing CWD to root (/)")
-        print("CWD reverting after call.")
+    print("Changing CWD to root (/)", verbose)
+    print("CWD reverting after call.", verbose)
     os.chdir("/")
     selfupdate.update(force, check_dev, verbose=verbose)
     os.chdir(cwd)

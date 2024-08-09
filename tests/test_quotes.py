@@ -8,9 +8,7 @@ def test_zero_quote_diff(quote_diff_duplicate: int):
 
 
 def test_query_identifier(quote_list):
-    quote: main.Optional[main.Quote] = main.query_quote(
-        quote_list, identifier=0, author=None
-    )
+    quote: main.Quote | None = main.query_quote(quote_list, identifier=0, author=None)
     assert isinstance(quote, main.Quote)
 
 

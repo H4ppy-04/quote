@@ -135,10 +135,21 @@ class Quote:
         return "Quote #{}: {} - {}".format(self.identifier, self.quote, self.author)
 
 
+def file_is_empty(file: str = "quotes.json") -> bool:
+    return os.stat(file).st_size == 0
+
+
 def read_json(file: str = "quotes.json"):
-    with open(file, "r") as reader:
-        contents: dict[int, str] = json.loads(reader.read())
-        return contents
+    if not os.path.exists(file):
+        with open(file, "w") as fs:
+            fs.close()
+    elif file_is_empty(file):
+        pass
+    else:
+        with open(file, "r") as reader:
+            contents: dict[int, str] = json.loads(reader.read())
+            return contents
+    return json.loads("{}")
 
 
 def load_quotes(file: str = "quotes.json") -> list[Quote]:

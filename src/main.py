@@ -71,16 +71,13 @@ class Parser:
             ),
         }
 
-        self.parsers["query"].add_argument(
-            "--author", help="Quote author", required=False
-        )
-        self.parsers["query"].add_argument(
-            "--id", help="Quote ID number", required=False
-        )
-        self.parsers["query"].add_argument(
-            "--list", help="List all quotes", action="store_true"
-        )
-        self.parsers["query"].add_argument(
+        query_group = self.parsers["query"].add_mutually_exclusive_group(required=True)
+
+        query_group.add_argument("--author", help="Quote author")
+        query_group.add_argument("--id", help="Quote ID number")
+
+        query_group.add_argument("--list", help="List all quotes", action="store_true")
+        query_group.add_argument(
             "--show-duplicates",
             help="Show duplicate quotes",
             action="store_true",

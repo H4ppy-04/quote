@@ -46,7 +46,7 @@ COMMANDS
 
 REFERENCES
 
-    (1): https://github.com/Trivoz/quote
+    (1): https://github.com/H4ppy-04/quote
 
 
 

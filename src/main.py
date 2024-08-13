@@ -34,11 +34,7 @@ from shutil import which
 from typing import override
 
 import update
-
-
-def _print(msg, verbose: bool = False):
-    if verbose:
-        print(msg)
+from update import __print as _print
 
 
 class Parser:
@@ -208,9 +204,9 @@ def prune_quotes(quotes_dict: dict[int, str], verbose: bool = False) -> dict | s
     else:
         for index, duplicate in enumerate(duplicates):
             # make sure that the Quote exists (pyright)
-            _print(f"Checking quote #{index}", verbose)
+            _print(verbose, f"Checking quote #{index}")
             if isinstance(duplicate, Quote):
-                _print(f"Removing quote #{duplicate.identifier}", verbose)
+                _print(verbose, f"Removing quote #{duplicate.identifier}")
                 del quotes_dict[duplicate.identifier]
     return quotes_dict
 
@@ -258,8 +254,7 @@ def update_changes(
     verbose: bool = False,
 ):
     cwd = os.getcwd()
-    _print("Changing CWD to root (/)", verbose)
-    _print("CWD reverting after call.", verbose)
+    _print(verbose, "Changing CWD to root (/)\nReverting after call.")
     os.chdir("/")
     update.pull_changes(force, check_dev, verbose=verbose)
     os.chdir(cwd)

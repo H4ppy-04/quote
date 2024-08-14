@@ -13,11 +13,20 @@ OPTIONS
       (When supported) use 8-base colors for more colorful output.
       This is not fully integrated yet, as logging is still being worked on.
 
+    --verbose 
+
+      Print additional debug messages. Useful for debugging or submitting traceback logs.
+
     -V | --version
 
       Print the current version. This interfaces with Git, and requires Git to be installed and .git to be present.
 
 COMMANDS
+
+    qotd (quote of the day)
+
+      Print the quote of the day! This simply indexes a random quote from the quote list. Note that if the --verbose argument is specified
+      and no quote is found, then this will be conveyed via a log message.
 
     query <[--author <name>] | [--id <id>]> [--show-duplicates]
 

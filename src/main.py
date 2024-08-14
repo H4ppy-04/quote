@@ -205,11 +205,8 @@ def prune_quotes(quotes_dict: dict[int, str], verbose: bool = False) -> dict | s
         return "No duplicates found"
     else:
         for index, duplicate in enumerate(duplicates):
-            # make sure that the Quote exists (pyright)
-            _print(verbose, f"Checking quote #{index}")
-            if isinstance(duplicate, Quote):
-                _print(verbose, f"Removing quote #{duplicate.identifier}")
-                del quotes_dict[duplicate.identifier]
+            _print(verbose, f"Removing quote #{duplicate.identifier}")
+            del quotes_dict[duplicate.identifier]
     return quotes_dict
 
 

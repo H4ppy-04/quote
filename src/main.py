@@ -56,6 +56,8 @@ class Parser:
             type=str,
         )
 
+        self.argument_parser.add_argument("qotd", help="Get the quote of the day!")
+
         subparsers = self.argument_parser.add_subparsers(dest="command")
 
         self.parsers = {
@@ -273,6 +275,13 @@ def main():
     quote_file = parser.args.file if parser.args.file is not None else "quotes.json"
 
     match parser.args.command:
+        case "qotd":
+            quote = random_quote(quotes)
+            if quote is not None:
+                print(quote)
+            else:
+                _print(parser.args.verbose, "Couldn't find any quotes! :'(")
+
         case "query":
             if parser.args.list:
                 list_quotes(
@@ -284,11 +293,14 @@ def main():
                 quote = query_quote(quotes, parser.args.id, author=parser.args.author)
                 print(quote)
 
+            sys.exit()
+
         case "add":
             add_quote(
                 parser.args.quote, parser.args.author, len(quotes), file=quote_file
             )
-            sys.exit(f"Added quote #{len(quotes)-1}.")
+            _print(parser.args.verbose, f"Added quote #{len(quotes)-1}.")
+            sys.exit()
 
         case "prune":
             pruned_quotes: str | dict[str, Quote] = prune_quotes(
@@ -300,12 +312,18 @@ def main():
                     writer.close()
 
                 diff = get_quote_diff(quotes, pruned_quotes)
-                sys.exit(f"Finished pruning quotes. ({diff} duplicates)")
+                _print(
+                    parser.args.verbose,
+                    f"Finished pruning quotes. ({diff} duplicates)",
+                )
             else:
-                sys.exit(pruned_quotes)
+                _print(parser.args.verbose, pruned_quotes)
+            sys.exit()
 
         case "version":
-            sys.exit(get_version())
+            current_version = get_version()
+            print(current_version)
+            sys.exit()
 
         case "update":
             update_changes(

@@ -50,13 +50,24 @@ class Parser:
         )
 
         self.argument_parser.add_argument(
+            "--verbose",
+            help="Display additional log messages",
+            action="store_true",
+            default=False,
+        )
+
+        self.argument_parser.add_argument(
             "--file",
             help="Use a custom quotes file instead of the default quotes.json file",
             required=False,
             type=str,
         )
 
-        self.argument_parser.add_argument("qotd", help="Get the quote of the day!")
+        self.argument_parser.add_argument(
+            "qotd",
+            help="Get the quote of the day!",
+            action="store_true",
+        )
 
         subparsers = self.argument_parser.add_subparsers(dest="command")
 
@@ -84,17 +95,6 @@ class Parser:
         self.parsers["add"].add_argument("--author", dest="author", help="Quote author")
         self.parsers["add"].add_argument("quote", help="The quote text")
 
-        self.parsers["prune"].add_argument(
-            "--verbose",
-            help="Print deletion events and quote ID's",
-            action="store_true",
-        )
-
-        self.parsers["update"].add_argument(
-            "--verbose",
-            help="Print additional messages for debugging",
-            action="store_true",
-        )
         self.parsers["update"].add_argument(
             "--force",
             help="Ignore any changes made to source code (DESTRUCTIVE)",

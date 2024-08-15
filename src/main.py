@@ -171,16 +171,16 @@ def add_quote(quote: str, author: str, identifier: int, file=QUOTE_FILE):
 
 
 def list_quotes(
-    quotes: list[Quote], show_duplicates: bool = False, author: str | None = None
+    quotes: list[Quote],
+    show_duplicate_quotes: bool = False,
+    author_filter: str | None = None,
 ) -> list[str]:
     seen_quotes: list[str] = []
 
     for quote in quotes:
-        if author and quote.author != author:
+        if author_filter and quote.author != author_filter:
             continue
-        if quote.quote in seen_quotes and show_duplicates:
-            print(quote)
-        else:
+        if quote.quote in seen_quotes and show_duplicate_quotes:
             print(quote)
         seen_quotes.append(quote.quote)
     return seen_quotes
@@ -188,13 +188,13 @@ def list_quotes(
 
 def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote] | None:
     seen_quotes: list[str] = []
-    duplicates: list[Quote] = []
+    duplicate_quotes: list[Quote] = []
 
     for quote in quotes:
         if quote.quote in seen_quotes:
-            duplicates.append(quote)
+            duplicate_quotes.append(quote)
         seen_quotes.append(quote.quote)
-    return duplicates
+    return duplicate_quotes
 
 
 def write_pruned_quotes(
@@ -205,10 +205,10 @@ def write_pruned_quotes(
         json.dump(quotes_dict, writer)
         writer.close()
 
-    diff = get_quote_diff(quotes_list, quotes_dict)
+    quote_difference = get_quote_diff(quotes_list, quotes_dict)
     _print(
         verbose,
-        f"Finished pruning quotes. ({diff} duplicates)",
+        f"Finished pruning quotes. ({quote_difference} duplicates)",
     )
 
 
@@ -216,28 +216,30 @@ def read_pruned_quotes(
     quotes_dict: dict[int, str], verbose: bool = False
 ) -> dict | str:
     quotes_list: list[Quote] = load_quotes()
-    duplicates: list[Quote] | None = get_duplicate_quotes(quotes_list)
+    duplicate_quotes: list[Quote] | None = get_duplicate_quotes(quotes_list)
 
-    if (isinstance(duplicates, list) and len(duplicates) == 0) or duplicates is None:
+    if (
+        isinstance(duplicate_quotes, list) and len(duplicate_quotes) == 0
+    ) or duplicate_quotes is None:
         return "No duplicates found"
 
-    for index, duplicate in enumerate(duplicates):
+    for index, duplicate in enumerate(duplicate_quotes):
         _print(verbose, f"Removing quote #{duplicate.identifier}")
         del quotes_dict[duplicate.identifier]
     return quotes_dict
 
 
 def query_quote(
-    quotes: list[Quote], identifier: int | None, author: str | None
+    quotes: list[Quote], quote_identifier: int | None, quote_author: str | None
 ) -> Quote | None:
-    if identifier is not None:
+    if quote_identifier is not None:
         for quote in quotes:
-            if int(quote.identifier) == int(identifier):
+            if int(quote.identifier) == int(quote_identifier):
                 return quote
-    if author is not None:
+    if quote_author is not None:
         selected_quotes: list[Quote] = []
         for quote in quotes:
-            if quote.author == author:
+            if quote.author == quote_author:
                 selected_quotes.append(quote)
         return random_quote(selected_quotes)
 
@@ -252,16 +254,16 @@ def get_version() -> str:
     if git_path is None:
         return "Git is not installed"
 
-    tag = subprocess.run(
+    tag_process = subprocess.run(
         ["git", "describe", "--abbrev=0"],
         encoding="utf8",
         stdout=subprocess.PIPE,
     )
 
-    if tag.returncode > 0:
-        return tag.stderr
+    if tag_process.returncode > 0:
+        return tag_process.stderr
     else:
-        return tag.stdout
+        return tag_process.stdout
 
 
 def update_changes(
@@ -269,18 +271,18 @@ def update_changes(
     check_dev: bool = True,
     verbose: bool = False,
 ):
-    cwd = os.getcwd()
+    initial_working_directory = os.getcwd()
     _print(verbose, "Changing CWD to root (/)\nReverting after call.")
     os.chdir("/")
     update.pull_changes(force, check_dev, verbose=verbose)
-    os.chdir(cwd)
+    os.chdir(initial_working_directory)
 
 
 def get_quote_diff(old_list: list[Quote], new_dict: dict[str, Quote]) -> int:
     """Find the difference in value between an old and new quote file"""
 
-    diff = len(old_list) - len(new_dict.keys())
-    return diff
+    quote_difference = len(old_list) - len(new_dict.keys())
+    return quote_difference
 
 
 def main():
@@ -300,11 +302,11 @@ def main():
             if parser.args.list:
                 list_quotes(
                     quotes,
-                    show_duplicates=parser.args.show_duplicates,
-                    author=parser.args.author,
+                    show_duplicate_quotes=parser.args.show_duplicates,
+                    author_filter=parser.args.author,
                 )
             else:
-                quote = query_quote(quotes, parser.args.id, author=parser.args.author)
+                quote = query_quote(quotes, parser.args.id, parser.args.author)
                 print(quote)
 
         case "add":

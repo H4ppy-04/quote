@@ -36,6 +36,9 @@ from typing import override
 import update
 from update import __print as _print
 
+# the default quote file that is presumed to be present in ../ relative to main.py
+QUOTE_FILE: str = "quotes.json"
+
 
 class Parser:
 
@@ -58,7 +61,7 @@ class Parser:
 
         self.argument_parser.add_argument(
             "--file",
-            help="Use a custom quotes file instead of the default quotes.json file",
+            help=f"Use a custom quotes file instead of the default {QUOTE_FILE} file",
             required=False,
             type=str,
         )
@@ -128,11 +131,11 @@ class Quote:
         return "Quote #{}: {} - {}".format(self.identifier, self.quote, self.author)
 
 
-def file_is_empty(file: str = "quotes.json") -> bool:
+def file_is_empty(file=QUOTE_FILE) -> bool:
     return os.stat(file).st_size == 0
 
 
-def read_json(file: str = "quotes.json"):
+def read_json(file=QUOTE_FILE):
     if not os.path.exists(file):
         with open(file, "w") as fs:
             fs.close()
@@ -145,7 +148,7 @@ def read_json(file: str = "quotes.json"):
     return json.loads("{}")
 
 
-def load_quotes(file: str = "quotes.json") -> list[Quote]:
+def load_quotes(file=QUOTE_FILE) -> list[Quote]:
     contents: dict = read_json(file)
     quotes: list[Quote] = [
         Quote(i, contents[i]["quote"], contents[i]["author"]) for i in contents
@@ -158,13 +161,13 @@ def random_quote(quotes: list[Quote]) -> Quote | None:
         return random.choice(quotes)
 
 
-def add_quote(quote: str, author: str, identifier: int, file="quotes.json"):
+def add_quote(quote: str, author: str, identifier: int, file=QUOTE_FILE):
     _quote = Quote(identifier, quote, author)
 
     file_contents: dict = read_json(file)
     file_contents[_quote.identifier] = {"quote": _quote.quote, "author": _quote.author}
 
-    with open("quotes.json", "w") as writer:
+    with open(QUOTE_FILE, "w") as writer:
         json.dump(file_contents, writer)
         writer.close()
 
@@ -269,7 +272,7 @@ def get_quote_diff(old_list: list[Quote], new_dict: dict[str, Quote]) -> int:
 def main():
     parser: Parser = Parser()
     quotes: list[Quote] = load_quotes()
-    quote_file = parser.args.file if parser.args.file is not None else "quotes.json"
+    quote_file = parser.args.file if parser.args.file is not None else QUOTE_FILE
 
     match parser.args.command:
         case "qotd":

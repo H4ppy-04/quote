@@ -148,22 +148,20 @@ def read_json(file=QUOTE_FILE):
 
 def load_quotes(file=QUOTE_FILE) -> list[Quote]:
     contents: dict = read_json(file)
-    quotes: list[Quote] = [
+    quotes_list: list[Quote] = [
         Quote(i, contents[i]["quote"], contents[i]["author"]) for i in contents
     ]
-    return quotes
+    return quotes_list
 
 
-def random_quote(quotes: list[Quote]) -> Quote | None:
-    if len(quotes):
-        return random.choice(quotes)
+def random_quote(quotes_list: list[Quote]) -> Quote | None:
+    if len(quotes_list):
+        return random.choice(quotes_list)
 
 
 def add_quote(quote: str, author: str, identifier: int, file=QUOTE_FILE):
-    _quote = Quote(identifier, quote, author)
-
     file_contents: dict = read_json(file)
-    file_contents[_quote.identifier] = {"quote": _quote.quote, "author": _quote.author}
+    file_contents[identifier] = {"quote": quote, "author": author}
 
     with open(QUOTE_FILE, "w") as writer:
         json.dump(file_contents, writer)
@@ -171,13 +169,13 @@ def add_quote(quote: str, author: str, identifier: int, file=QUOTE_FILE):
 
 
 def list_quotes(
-    quotes: list[Quote],
+    quotes_list: list[Quote],
     show_duplicate_quotes: bool = False,
     author_filter: str | None = None,
 ) -> list[str]:
     seen_quotes: list[str] = []
 
-    for quote in quotes:
+    for quote in quotes_list:
         if author_filter and quote.author != author_filter:
             continue
         if quote.quote in seen_quotes and show_duplicate_quotes:
@@ -186,11 +184,11 @@ def list_quotes(
     return seen_quotes
 
 
-def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote] | None:
+def get_duplicate_quotes(quotes_list: list[Quote]) -> list[Quote] | None:
     seen_quotes: list[str] = []
     duplicate_quotes: list[Quote] = []
 
-    for quote in quotes:
+    for quote in quotes_list:
         if quote.quote in seen_quotes:
             duplicate_quotes.append(quote)
         seen_quotes.append(quote.quote)
@@ -230,15 +228,15 @@ def read_pruned_quotes(
 
 
 def query_quote(
-    quotes: list[Quote], quote_identifier: int | None, quote_author: str | None
+    quotes_list: list[Quote], quote_identifier: int | None, quote_author: str | None
 ) -> Quote | None:
     if quote_identifier is not None:
-        for quote in quotes:
+        for quote in quotes_list:
             if int(quote.identifier) == int(quote_identifier):
                 return quote
     if quote_author is not None:
         selected_quotes: list[Quote] = []
-        for quote in quotes:
+        for quote in quotes_list:
             if quote.author == quote_author:
                 selected_quotes.append(quote)
         return random_quote(selected_quotes)
@@ -287,12 +285,12 @@ def get_quote_diff(old_list: list[Quote], new_dict: dict[str, Quote]) -> int:
 
 def main():
     parser: Parser = Parser()
-    quotes: list[Quote] = load_quotes()
+    quotes_list: list[Quote] = load_quotes()
     quote_file: str = parser.args.file if parser.args.file is not None else QUOTE_FILE
 
     match parser.args.command:
         case "qotd":
-            quote = random_quote(quotes)
+            quote = random_quote(quotes_list)
             if quote is not None:
                 print(quote)
             else:
@@ -301,19 +299,19 @@ def main():
         case "query":
             if parser.args.list:
                 list_quotes(
-                    quotes,
+                    quotes_list,
                     show_duplicate_quotes=parser.args.show_duplicates,
                     author_filter=parser.args.author,
                 )
             else:
-                quote = query_quote(quotes, parser.args.id, parser.args.author)
+                quote = query_quote(quotes_list, parser.args.id, parser.args.author)
                 print(quote)
 
         case "add":
             add_quote(
-                parser.args.quote, parser.args.author, len(quotes), file=quote_file
+                parser.args.quote, parser.args.author, len(quotes_list), file=quote_file
             )
-            _print(parser.args.verbose, f"Added quote #{len(quotes)-1}.")
+            _print(parser.args.verbose, f"Added quote #{len(quotes_list)-1}.")
 
         case "prune":
             pruned_quotes: str | dict[str, Quote] = read_pruned_quotes(
@@ -321,7 +319,7 @@ def main():
             )
             quotes_is_dict = isinstance(pruned_quotes, dict)
             if quotes_is_dict:
-                write_pruned_quotes(quotes, pruned_quotes, parser.args.verbose)
+                write_pruned_quotes(quotes_list, pruned_quotes, parser.args.verbose)
             elif quotes_is_dict is False:
                 _print(parser.args.verbose, pruned_quotes)
 

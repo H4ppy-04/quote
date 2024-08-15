@@ -288,7 +288,7 @@ def get_quote_diff(old_list: list[Quote], new_dict: dict[str, Quote]) -> int:
 def main():
     parser: Parser = Parser()
     quotes: list[Quote] = load_quotes()
-    quote_file = parser.args.file if parser.args.file is not None else QUOTE_FILE
+    quote_file: str = parser.args.file if parser.args.file is not None else QUOTE_FILE
 
     match parser.args.command:
         case "qotd":

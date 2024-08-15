@@ -139,9 +139,7 @@ def read_json(file=QUOTE_FILE):
     if not os.path.exists(file):
         with open(file, "w") as fs:
             fs.close()
-    elif file_is_empty(file):
-        pass
-    else:
+    elif not file_is_empty(file):
         with open(file, "r") as reader:
             contents: dict[int, str] = json.loads(reader.read())
             return contents
@@ -180,9 +178,8 @@ def list_quotes(
     for quote in quotes:
         if author and quote.author != author:
             continue
-        if quote.quote in seen_quotes:
-            if show_duplicates:
-                print(quote)
+        if quote.quote in seen_quotes and show_duplicates:
+            print(quote)
         else:
             print(quote)
         seen_quotes.append(quote.quote)
@@ -200,16 +197,33 @@ def get_duplicate_quotes(quotes: list[Quote]) -> list[Quote] | None:
     return duplicates
 
 
-def prune_quotes(quotes_dict: dict[int, str], verbose: bool = False) -> dict | str:
+def write_pruned_quotes(
+    quotes_list: list[Quote], quotes_dict: dict, verbose: bool = False, file=QUOTE_FILE
+):
+
+    with open(file, "w") as writer:
+        json.dump(quotes_dict, writer)
+        writer.close()
+
+    diff = get_quote_diff(quotes_list, quotes_dict)
+    _print(
+        verbose,
+        f"Finished pruning quotes. ({diff} duplicates)",
+    )
+
+
+def read_pruned_quotes(
+    quotes_dict: dict[int, str], verbose: bool = False
+) -> dict | str:
     quotes_list: list[Quote] = load_quotes()
     duplicates: list[Quote] | None = get_duplicate_quotes(quotes_list)
 
     if (isinstance(duplicates, list) and len(duplicates) == 0) or duplicates is None:
         return "No duplicates found"
-    else:
-        for index, duplicate in enumerate(duplicates):
-            _print(verbose, f"Removing quote #{duplicate.identifier}")
-            del quotes_dict[duplicate.identifier]
+
+    for index, duplicate in enumerate(duplicates):
+        _print(verbose, f"Removing quote #{duplicate.identifier}")
+        del quotes_dict[duplicate.identifier]
     return quotes_dict
 
 
@@ -293,42 +307,33 @@ def main():
                 quote = query_quote(quotes, parser.args.id, author=parser.args.author)
                 print(quote)
 
-            sys.exit()
-
         case "add":
             add_quote(
                 parser.args.quote, parser.args.author, len(quotes), file=quote_file
             )
             _print(parser.args.verbose, f"Added quote #{len(quotes)-1}.")
-            sys.exit()
 
         case "prune":
-            pruned_quotes: str | dict[str, Quote] = prune_quotes(
+            pruned_quotes: str | dict[str, Quote] = read_pruned_quotes(
                 read_json(file=quote_file), parser.args.verbose
             )
-            if isinstance(pruned_quotes, dict):
-                with open(quote_file, "w") as writer:
-                    json.dump(pruned_quotes, writer)
-                    writer.close()
-
-                diff = get_quote_diff(quotes, pruned_quotes)
-                _print(
-                    parser.args.verbose,
-                    f"Finished pruning quotes. ({diff} duplicates)",
-                )
-            else:
+            quotes_is_dict = isinstance(pruned_quotes, dict)
+            if quotes_is_dict:
+                write_pruned_quotes(quotes, pruned_quotes, parser.args.verbose)
+            elif quotes_is_dict is False:
                 _print(parser.args.verbose, pruned_quotes)
-            sys.exit()
 
         case "version":
             current_version = get_version()
             print(current_version)
-            sys.exit()
 
         case "update":
             update_changes(
                 parser.args.force, parser.args.check_dev, parser.args.verbose
             )
+
+
+sys.exit()
 
 
 if __name__ == "__main__":

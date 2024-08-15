@@ -332,6 +332,12 @@ def main():
                 parser.args.force, parser.args.check_dev, parser.args.verbose
             )
 
+        case _:
+            _print(
+                verbose=True,
+                msg="Couldn't locate the source or origin of the specified command.",
+            )
+
 
 sys.exit()
 
